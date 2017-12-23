@@ -17,6 +17,8 @@ public:
 		direction = _p.direction;
 		weight = _p.weight;
 	}
+
+	//void transport();
 };
 
 #endif // !PARTICLE_H
