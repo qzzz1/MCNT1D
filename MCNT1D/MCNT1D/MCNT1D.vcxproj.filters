@@ -27,7 +27,13 @@
     <ClCompile Include="input.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="transport.cpp">
+    <ClCompile Include="MonteCarlo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="geometry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="rand.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -54,6 +60,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MonteCarlo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sample.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="rand.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

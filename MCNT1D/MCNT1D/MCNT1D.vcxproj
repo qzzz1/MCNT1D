@@ -115,11 +115,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="geometry.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="MCNT1D.cpp" />
     <ClCompile Include="output.cpp" />
     <ClCompile Include="particle.cpp" />
-    <ClCompile Include="transport.cpp" />
+    <ClCompile Include="MonteCarlo.cpp" />
+    <ClCompile Include="rand.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cell.h" />
@@ -130,6 +132,8 @@
     <ClInclude Include="neutron.h" />
     <ClInclude Include="output.h" />
     <ClInclude Include="particle.h" />
+    <ClInclude Include="rand.h" />
+    <ClInclude Include="sample.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
