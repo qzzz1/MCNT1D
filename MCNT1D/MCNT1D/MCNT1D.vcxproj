@@ -117,20 +117,23 @@
   <ItemGroup>
     <ClCompile Include="geometry.cpp" />
     <ClCompile Include="input.cpp" />
+    <ClCompile Include="line.cpp" />
     <ClCompile Include="MCNT1D.cpp" />
     <ClCompile Include="output.cpp" />
     <ClCompile Include="particle.cpp" />
     <ClCompile Include="MonteCarlo.cpp" />
     <ClCompile Include="rand.cpp" />
+    <ClCompile Include="sample.cpp" />
+    <ClCompile Include="transport.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cell.h" />
+    <ClInclude Include="exception.h" />
     <ClInclude Include="geometry.h" />
-    <ClInclude Include="input.h" />
+    <ClInclude Include="line.h" />
     <ClInclude Include="material.h" />
     <ClInclude Include="MonteCarlo.h" />
     <ClInclude Include="neutron.h" />
-    <ClInclude Include="output.h" />
     <ClInclude Include="particle.h" />
     <ClInclude Include="rand.h" />
     <ClInclude Include="sample.h" />

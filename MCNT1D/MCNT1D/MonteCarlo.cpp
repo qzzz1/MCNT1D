@@ -4,16 +4,9 @@
 #include "sample.h"
 
 #include <iostream>
-#include <numeric>
+#include <numeric>                      
 
-/*------------------------------------------------------------------
-	功能：轮盘赌。
-	产生一个0~1的随机数，若大于权重的小数部分，则向上取整；否则向下取整。
-	参数：权重
-	返回：赌的结果
-	示例: roulette(weight);
--------------------------------------------------------------------*/
-int roulette(double _weight) {
+int MonteCarlo::roulette(double _weight) {
 	if (_weight - (int)_weight < random())return (int)_weight;
 	else return (int)(_weight + 1);
 }
@@ -82,100 +75,46 @@ bool MonteCarlo::ifNeutronSourceBankEmpty() {
 	return true;
 }
 
-void MonteCarlo::inactiveKeff() {
+void MonteCarlo::currentKeff(int _iterationNumber) {
 	int nextParticleNumber = 0;
-	double currentKeff = 0;
+	
 	//累加各群下一代中子数
 	for (int i = 1; i <= this->groupNumber; i++)nextParticleNumber += multiGroupNextParticleSourceBank[i].size();
-	//Keff的定义
-	currentKeff = nextParticleNumber / this->currentParticleNumber;
+	//Keff的计算:非活跃代只计算Keff，Keff平均值和统计误差均记为0，活跃代调用此函数时平均值和统计误差会重新更新
+	this->Keff[_iterationNumber - 1] = nextParticleNumber / this->currentParticleNumber;
+	this->averageKeff[_iterationNumber - 1] = 0;
+	this->KeffStandardDeviation[_iterationNumber - 1] = 0;
 }
 
-void MonteCarlo::inactiveFlux() {
+void MonteCarlo::currentFlux(int _iterationNumber) {
 	//通量数据存储于MonteCarlo::flux中，第一维是能群号，第二维是栅元号
 }
 
-void MonteCarlo::activeKeff() {
+void MonteCarlo::activeKeff(int _iterationNumber) {
+	//计算当前代Keff并存储
+	currentKeff(_iterationNumber);
 
+	double accmKeff = std::accumulate(Keff.begin() + inactiveGenerationNumber, Keff.begin() + _iterationNumber, 0.0);
+	averageKeff[_iterationNumber - 1] = accmKeff / (_iterationNumber - this->inactiveGenerationNumber);
+
+	//计算Keff的统计误差
+	double standardDeviation = 0;
+	if (_iterationNumber > this->inactiveGenerationNumber + 1) {
+		standardDeviation = sqrt((this->accumulateKeffSquare / (_iterationNumber - this->inactiveGenerationNumber) - (this->averageKeff[_iterationNumber - 1])*(this->averageKeff[_iterationNumber - 1])) / (_iterationNumber - this->inactiveGenerationNumber - 1)) / this->averageKeff[_iterationNumber - 1];
+	}
+	//计算Keff统计误差并存储
+	this->KeffStandardDeviation[_iterationNumber - 1] = standardDeviation;
 }
 
-void MonteCarlo::transport() {
-	//源迭代
-	for (int iGenerationCount = 0; iGenerationCount < this->totalGenerationNumber; iGenerationCount++) {
-		//分群输运
-		while (!ifNeutronSourceBankEmpty()) {
-			for (int iGroupCount = 1; iGroupCount <= this->groupNumber; iGroupCount++) {
-				while (!this->multiGroupParticleSourceBank[iGroupCount].empty()) {
-					neutron myNeutron;
-					//从粒子源中抽取一个粒子
-					myNeutron = sampleFromParticleSourceBank(this->multiGroupParticleSourceBank[iGroupCount]);
-
-					//权重过大的中子进行轮盘赌，分为数个权重为1的中子
-					if (myNeutron.weight > weightMax) {
-						int iRouletteResult = roulette(myNeutron.weight);
-						myNeutron.weight = 0;   //轮盘赌之后杀死原中子
-						//根据轮盘赌结果分裂
-						for (int i = 0; i < iRouletteResult; i++) {
-							neutron newNeutron = neutron(iGroupCount, myNeutron.x, myNeutron.direction, 1);
-							multiGroupParticleSourceBank[iGroupCount].push_back(newNeutron);
-						}
-
-						continue;              //直接重新抽样
-					}
-
-					//权重不为0的中子进行输运模拟
-					while (myNeutron.weight > 0) {
-						//对径迹长度抽样
-						double pathLength = samplePathLength(this->inputGeometry, myNeutron);
-						//判断是否穿过栅元边界
-						if (this->inputGeometry.ifCrossCellBoundary(myNeutron, pathLength)) {
-							//统计通量
-							if (myNeutron.direction > 0) {
-								double distanceToBoundary = (this->inputGeometry.geometryCell[this->inputGeometry.getCellID(myNeutron.x)]).right - myNeutron.x;
-								this->flux[iGroupCount][this->inputGeometry.getCellID(myNeutron.x)] += std::fabs(distanceToBoundary / myNeutron.direction*myNeutron.weight);
-							}
-							else if (myNeutron.direction < 0) {
-								double distanceToBoundary = myNeutron.x - (this->inputGeometry.geometryCell[this->inputGeometry.getCellID(myNeutron.x)]).left;
-								this->flux[iGroupCount][this->inputGeometry.getCellID(myNeutron.x)] += std::fabs(distanceToBoundary / myNeutron.direction*myNeutron.weight);
-							}
-							else {
-								std::cout << "Warning! W:Neutron direction = 0!" << std::endl;
-							}
-
-							//将飞过栅元边界的中子放在相邻栅元边界处，将飞出几何边界的中子杀死
-							this->inputGeometry.setCrossBoundaryPosition(myNeutron, pathLength);
-
-							//将中子放到下一栅元的边界处之后继续对径迹长度抽样，ray-tracking?
-							continue;
-						}
-						else {
-							//统计通量
-							this->flux[iGroupCount][this->inputGeometry.getCellID(myNeutron.x)] += pathLength * myNeutron.weight;
-
-							//将中子放到碰撞的位置
-							myNeutron.x += pathLength * myNeutron.direction;
-						} //通量统计完毕，碰撞点确定
-
-						//轮盘赌判断粒子是裂变还是散射
-						//计算当地总散射截面
-						double nativeSigmaS = std::accumulate(((this->inputGeometry.getMaterial(myNeutron.x)).sigmaS[iGroupCount]).begin(), ((this->inputGeometry.getMaterial(myNeutron.x)).sigmaS[iGroupCount]).end(), 0);
-						//获取当地总截面
-						double nativeSigmaT = (this->inputGeometry.getMaterial(myNeutron.x)).sigmaT[iGroupCount];
-						if (roulette(nativeSigmaS / nativeSigmaT)) { //拿散射的权重赌，赢则返回0
-							//返回1说明轮盘赌输掉，进行裂变
-							fission(myNeutron, iGroupCount, multiGroupNextParticleSourceBank);
-						}
-						else {
-							//否则散射
-							scatter(myNeutron, iGroupCount, multiGroupParticleSourceBank);
-						}
-					} //权重不为0的中子输运完毕
-				} //当前群输运完毕
-			} //所有群输运完毕
-		} //向上散射后所有群输运完毕
-
-		std::cout << "The " << iGenerationCount << "th generation neutron simulation was finished!" << std::endl;
-
-		
-	} //所有代输运完毕
+void MonteCarlo::activeFlux(int _iterationNumber) {
+	for (int iGroup = 1; iGroup <= this->groupNumber; iGroup++) {
+		for (int iCell = 1; iCell <= this->cellNumber; iCell++) {
+			this->accumulateFlux[iGroup][iCell] += this->flux[iGroup][iCell];
+			this->accumulateFluxSquare[iGroup][iCell] += (this->flux[iGroup][iCell])*(this->flux[iGroup][iCell]);
+			this->averageFlux[iGroup][iCell] = this->accumulateFlux[iGroup][iCell] / (_iterationNumber - this->inactiveGenerationNumber);
+			//第一个活跃代没有统计误差
+			if(_iterationNumber!=this->inactiveGenerationNumber + 1) this->fluxStandardDeviation[iGroup][iCell] = sqrt(((this->accumulateFluxSquare[iGroup][iCell] / (_iterationNumber - this->inactiveGenerationNumber) - (this->averageFlux[iGroup][iCell])*(this->averageFlux[iGroup][iCell])) / (_iterationNumber - this->inactiveGenerationNumber - 1))) / this->averageFlux[iGroup][iCell];
+			else this->fluxStandardDeviation[iGroup][iCell] = 0;
+		}
+	}
 }

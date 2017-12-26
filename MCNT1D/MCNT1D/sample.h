@@ -7,6 +7,7 @@
 #include "cell.h"
 #include "neutron.h"
 #include "rand.h"
+#include "geometry.h"
 
 /*---------------------------------------------------------------------------------------------------
 	从多群粒子源中的某一群中抽取一个粒子。
@@ -15,11 +16,7 @@
 	eg： sampleFromParticleSourceBank(multiGroupParticleSourceBank[groupNumber]);
 ---------------------------------------------------------------------------------------------------*/
 template <class P>
-P sampleFromParticleSourceBank(std::vector<P> &_sourceBank) {
-	P sampledParticle = _sourceBank.back();
-	_sourceBank.pop_back();
-	return sampledParticle;
-}
+P sampleFromParticleSourceBank(std::vector<P> &_sourceBank);
 
 /*----------------------------------------------------------
 	根据能群和栅元抽取径迹长度。
@@ -27,10 +24,6 @@ P sampleFromParticleSourceBank(std::vector<P> &_sourceBank) {
 	返回：径迹长度
 	eg: samplePathLength(geometry,neutron);
 ----------------------------------------------------------*/
-double samplePathLength(geometry _geometry, neutron _neutron) {
-	double __x = _neutron.x;
-	double __sigmaT = (_geometry.getMaterial(_geometry.getCellID(__x))).sigmaT;
-	return -log(random()) / __sigmaT;
-}
+double samplePathLength(int _group, geometry _geometry, neutron _neutron);
 
 #endif // !SAMPLE_H

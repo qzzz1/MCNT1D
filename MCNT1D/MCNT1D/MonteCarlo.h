@@ -35,18 +35,24 @@ private:
 	//template<class P>
 	std::vector<std::vector<neutron>> multiGroupNextParticleSourceBank;      //子代粒子库
 	
-	std::vector<std::vector<double>> flux;                             //总通量
+	std::vector<std::vector<double>> flux;                             //总通量，第一维是能群号，第二维是栅元号
 	std::vector<std::vector<double>> averageFlux;                      //活跃代平均通量
-	double Keff;                                                       //当前代有效增殖系数
-	double averageKeff;                                                //活跃代平均有效增殖系数
+	std::vector<std::vector<double>> accumulateFlux;                   //活跃代通量累积
+	std::vector<std::vector<double>> accumulateFluxSquare;             //通量平方累加，用于计算方差
+	std::vector<std::vector<double>> fluxStandardDeviation;            //各通量方差
+
+	std::vector<double> Keff;                                          //各代有效增殖系数
+	std::vector<double> averageKeff;                                   //各代平均有效增殖系数，非活跃代记为0
+	double accumulateKeffSquare;                                       //有效增殖系数平方累加，用于计算方差
+	std::vector<double> KeffStandardDeviation;                         //各代Keff统计误差
 
 	std::string inputFileName;                                         //输入文件名
 	std::string outputFileName;                                        //输出文件名
 	std::ifstream inputFile;                                           //输入文件流
 	std::ofstream outputFile;                                          //输出文件流
 
-	double random() { return rand() / (double)RAND_MAX; }                   //生成一个0~1之间的随机数
-	double randomDirection() { return 2 * rand() / (double)RAND_MAX - 1; }  //生成一个-1~1之间的随机数
+	//double random() { return rand() / (double)RAND_MAX; }                   //生成一个0~1之间的随机数
+	//double randomDirection() { return 2 * rand() / (double)RAND_MAX - 1; }  //生成一个-1~1之间的随机数
 
 	double weightMax;
 	double weightMin;
@@ -75,13 +81,46 @@ private:
 	---------------------------------------*/
 	bool ifNeutronSourceBankEmpty();
 
-	void inactiveKeff();
+	/*----------------------------------------------
+		功能：计算当前代有效增殖系数并存储进Keff向量。
+		参数：源迭代代数编号
+		返回：无
+		示例：currentKeff(interationNumber);
+	----------------------------------------------*/
+	void currentKeff(int _iterationNumber);
 
-	void inactiveFlux();
+	/*--------------------------------------------------
+		功能：计算当前代各能群各栅元通量并存储到二维向量中。
+		参数：源迭代代数编号
+		返回：无
+		示例：currentFlux(interationNumber);
+	--------------------------------------------------*/
+	void currentFlux(int _iterationNumber);
 
-	void activeKeff();
+	/*----------------------------------------------
+		功能：计算活跃代有效增殖系数并存储进Keff向量。
+		参数：源迭代代数编号
+		返回：无
+		示例：currentKeff(interationNumber);
+	----------------------------------------------*/
+	void activeKeff(int _iterationNumber);
 
-	void activeFlux();
+	/*---------------------------------------------------
+		功能：计算活跃代各能群各栅元通量并存储到二维向量中。
+		参数：源迭代代数编号
+		返回：无
+		示例：currentKeff(interationNumber);
+	---------------------------------------------------*/
+	void activeFlux(int _iterationNumber);
+
+	/*------------------------------------------------------------------
+	功能：轮盘赌。
+	产生一个0~1的随机数，若大于权重的小数部分，则向上取整；否则向下取整。
+	参数：权重
+	返回：赌的结果
+	示例: roulette(weight);
+	-------------------------------------------------------------------*/
+	int roulette(double _weight);
 
 public:
 	//void init();

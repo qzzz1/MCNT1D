@@ -1,5 +1,5 @@
-#include "input.h"
+#include "MonteCarlo.h"
 
-void input::inputInit() {
+void MonteCarlo::readInput() {
 
 }

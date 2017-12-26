@@ -1,7 +1,8 @@
 #include <string>
-#include "output.h"
+
+#include "MonteCarlo.h"
 
 
-void output::outputInit() {
+void MonteCarlo::output() {
 
 }
