@@ -14,14 +14,51 @@
 typedef enum { A, R, W } boundaryCondition;
 
 class geometry {
-public:
 	double left;
 	double right;
 	boundaryCondition leftCondition;
 	boundaryCondition rightCondition;
 	int cellNumber;
 
+public:
 	std::vector<cell> geometryCell;
+
+	void setLeft(double _leftPosition) { left = _leftPosition; }
+	void setRight(double _rightPosition) { right = _rightPosition; }
+
+	void setLeftBoundaryCondition(int _boundaryCondition) {
+		switch (_boundaryCondition)
+		{
+		case 0:
+			leftCondition = A;
+			break;
+		case 1:
+			leftCondition = R;
+			break;
+		case 2:
+			leftCondition = W;
+			break;
+		default:
+			break;
+		}
+	}
+
+	void setRightBoundaryCondition(int _boundaryCondition) {
+		switch (_boundaryCondition)
+		{
+		case 0:
+			rightCondition = A;
+			break;
+		case 1:
+			rightCondition = R;
+			break;
+		case 2:
+			rightCondition = W;
+			break;
+		default:
+			break;
+		}
+	}
 
 	geometry(double _left, double _right, std::vector<cell> _geomCell) :left(_left), right(_right), geometryCell(_geomCell) {}
 	

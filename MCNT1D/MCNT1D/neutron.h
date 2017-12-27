@@ -9,7 +9,7 @@ private:
 	int group;            //ÈººÅ
 public:
 
-	neutron(int _group, double _x, double _direction, double _weight) {		// :group(_group), x(_x), direction(_direction), weight(_weight) {}
+	neutron(int _group, double _x, double _direction, double _weight) {		
 		this->group = _group;
 		this->x = _x;
 		this->direction = _direction;

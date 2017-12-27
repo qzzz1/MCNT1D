@@ -6,11 +6,11 @@
 #include <fstream>
 #include <string>
 
-//#include "particle.h"
 #include "neutron.h"
 #include "material.h"
 #include "cell.h"
 #include "geometry.h"
+#include "input.h"
 
 //Monte Carlo类：保存计算条件，输运计算，结果输出
 class MonteCarlo {
@@ -19,6 +19,7 @@ private:
 	int groupNumber;                                         //能群数
 	int cellNumber;                                          //栅元数
 	int materialNumber;                                      //材料数
+	int repetitiveNumber;                                    //重复栅元组数
 	int neutronNumber;                                       //模拟中子数
 	int inactiveGenerationNumber;                            //非活跃代数
 	int totalGenerationNumber;                               //总代数
@@ -123,7 +124,8 @@ private:
 	int roulette(double _weight);
 
 public:
-	//void init();
+	friend void getCalculationCondition(MonteCarlo &_mc, iLine _line) throw(mcException);
+	void init();
 	void readInput();
 	void transport();
 	void output();

@@ -13,7 +13,7 @@ void MonteCarlo::transport() {
 				while (!this->multiGroupParticleSourceBank[iGroupCount].empty()) {
 					neutron myNeutron;
 					//从粒子源中抽取一个粒子
-					myNeutron = sampleFromParticleSourceBank(this->multiGroupParticleSourceBank[iGroupCount]);
+					myNeutron = sampleFromParticleSourceBank((this->multiGroupParticleSourceBank)[iGroupCount]);
 
 					//权重过大的中子进行轮盘赌，分为数个权重为1的中子
 					if (myNeutron.weight > weightMax) {
@@ -101,7 +101,7 @@ void MonteCarlo::transport() {
 		//更新中子库
 		multiGroupParticleSourceBank = multiGroupNextParticleSourceBank;
 		for (int i = 0; i < this->groupNumber; i++) {
-			if (multiGroupParticleSourceBank[i].size > 0) {
+			if (multiGroupParticleSourceBank[i].size() > 0) {
 				for (int j = 0; j < multiGroupParticleSourceBank[i].size(); j++)multiGroupParticleSourceBank[i][j].weight = nextNeutronWeight;
 			}
 			//清空缓存的中子库

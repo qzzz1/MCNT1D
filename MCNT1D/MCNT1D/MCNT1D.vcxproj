@@ -116,6 +116,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="geometry.cpp" />
+    <ClCompile Include="init.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="line.cpp" />
     <ClCompile Include="MCNT1D.cpp" />
@@ -130,6 +131,7 @@
     <ClInclude Include="cell.h" />
     <ClInclude Include="exception.h" />
     <ClInclude Include="geometry.h" />
+    <ClInclude Include="input.h" />
     <ClInclude Include="line.h" />
     <ClInclude Include="material.h" />
     <ClInclude Include="MonteCarlo.h" />

@@ -1,9 +1,7 @@
 #include "line.h"
+#pragma warning(disable:4996)
 
-
-iLine::iLine(std::string _aLine_)
-{
-}
+iLine::iLine(std::string _string_):_aLine_(_string_){}
 
 unsigned int iLine::lineLength()
 {
@@ -102,6 +100,11 @@ bool iLine::isThere(std::string _iKeyword_)
 	return false;
 }
 
+bool iLine::isEmpty() {
+	for (int i = 0; i < this->lineLength(); i++) if(this->_aLine_[i] != ' ') return false;
+	return true;
+}
+
 unsigned int iLine::wordNumber(std::string _iKeyword_)
 {
 	std::string aWord;
@@ -164,6 +167,11 @@ std::string iLine::operator[] (unsigned int _wNumber_)
 		} while (i <= _wNumber_);
 		return wNumberWord;
 	}
+}
+
+std::ostream &operator<< (std::ostream &out, const iLine &_line_) {
+	out << _line_._aLine_;
+	return out;
 }
 
 /*---------------------------------------------------------------------

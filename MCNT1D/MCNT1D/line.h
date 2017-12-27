@@ -28,6 +28,8 @@ public:
 	------------------------------------------------------------------------------*/
 	iLine(std::string _aLine_);
 
+	iLine() = default;
+
 	/*--------------------------------------------------
 	This functions returns length of the line.
 	eg:		iLine egLine("This is a test line.");
@@ -52,6 +54,8 @@ public:
 	The output of the two lines will be "1".
 	------------------------------------------------------------------------------*/
 	bool isThere(std::string _iKeyword_);
+
+	bool isEmpty();
 
 	/*--------------------------------------------------------------------------------------------------------------
 	This function tests where is some keyword in a sentence.
@@ -107,6 +111,14 @@ public:
 	The output of the two lines will be "test".
 	-----------------------------------------------------------------------------*/
 	std::string operator[] (unsigned int _wNumber_);
+
+	/*-----------------------------------------------
+		功能：重载流插入运算符，使能直接输出。
+		参数：运算符左边是输出流对象，右边是iLine对象
+		返回：输出流对象
+		示例：std::cout<<myLine<<std::endl;
+	-----------------------------------------------*/
+	friend std::ostream &operator<< (std::ostream &out, const iLine &_line_);
 };
 
 /*---------------------------------------------------------------------
