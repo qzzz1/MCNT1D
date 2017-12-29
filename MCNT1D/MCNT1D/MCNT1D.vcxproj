@@ -69,7 +69,10 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);C:\Program Files\MATLAB\R2017b\extern\include</IncludePath>
+    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64;C:\Program Files\MATLAB\R2017b\extern\lib\win64\microsoft</LibraryPath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -119,6 +122,7 @@
     <ClCompile Include="init.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="line.cpp" />
+    <ClCompile Include="matlab.cpp" />
     <ClCompile Include="MCNT1D.cpp" />
     <ClCompile Include="output.cpp" />
     <ClCompile Include="particle.cpp" />
@@ -129,14 +133,17 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cell.h" />
+    <ClInclude Include="electron.h" />
     <ClInclude Include="exception.h" />
     <ClInclude Include="geometry.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="line.h" />
     <ClInclude Include="material.h" />
+    <ClInclude Include="matlab.h" />
     <ClInclude Include="MonteCarlo.h" />
     <ClInclude Include="neutron.h" />
     <ClInclude Include="particle.h" />
+    <ClInclude Include="photon.h" />
     <ClInclude Include="rand.h" />
     <ClInclude Include="sample.h" />
   </ItemGroup>

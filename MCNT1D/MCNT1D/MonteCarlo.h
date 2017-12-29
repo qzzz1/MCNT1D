@@ -64,7 +64,7 @@ private:
 		返回：无
 		示例：fission(myNeutron, groupID, multiGroupNextNeutronSourceBank);
 	-------------------------------------------------------------------------*/
-	void fission(neutron &_neutron, int _group, std::vector<std::vector<neutron>> &_nextNeutronSourceBank);
+	void fission(neutron &_neutron, int _group, double _fissionWeight, std::vector<std::vector<neutron>> &_nextNeutronSourceBank);
 
 	/*-------------------------------------------------------------------------
 		功能：模拟一个中子到各群的散射过程。
@@ -124,10 +124,60 @@ private:
 	int roulette(double _weight);
 
 public:
+	/*-------------------------------------------------
+		功能：构造函数。
+		参数：输入文件文件名，输出文件文件名
+		返回：MonteCarlo对象
+		示例：MonteCarlo mcnt("file.in", "file.out");
+	--------------------------------------------------*/
+	MonteCarlo(const std::string _inFileName, const std::string _outFileName = ".out");
+
+	/*-----------------------
+		功能：蒙卡模拟运行。
+		参数：无
+		返回：无
+		示例：mcnt.run();
+	-----------------------*/
+	void run();
+
+	/*--------------------------------------------------
+		功能：读取计算条件。友元函数，定义在input.cpp中。
+		参数：MonteCarlo对象（引用），读取到的文本
+		返回：无
+		示例：getCalculationCondition(mcnt, lineRead);
+	---------------------------------------------------*/
 	friend void getCalculationCondition(MonteCarlo &_mc, iLine _line) throw(mcException);
+
+	/*-------------------------------
+		功能：初始化。为变量分配内存等。
+		参数：无
+		返回：无
+		示例：mcnt.init();
+	--------------------------------*/
 	void init();
+
+	/*------------------------------
+		功能：读入输入文件。
+		参数：无
+		返回：无
+		示例：mcnt.readInput();
+	------------------------------*/
 	void readInput();
+
+	/*-----------------------------
+		功能：蒙卡粒子输运过程。
+		参数：无
+		返回：无
+		示例：mcnt.transport();
+	-----------------------------*/
 	void transport();
+
+	/*-----------------------------
+		功能：输出蒙卡输运计算结果。
+		参数：无
+		返回：无
+		示例：mcnt.output();
+	-----------------------------*/
 	void output();
 };
 

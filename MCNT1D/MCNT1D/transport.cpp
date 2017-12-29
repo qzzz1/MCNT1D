@@ -19,7 +19,7 @@ void MonteCarlo::transport() {
 					if (myNeutron.weight > weightMax) {
 						int iRouletteResult = roulette(myNeutron.weight);
 						myNeutron.weight = 0;   //轮盘赌之后杀死原中子
-												//根据轮盘赌结果分裂
+						//根据轮盘赌结果分裂
 						for (int i = 0; i < iRouletteResult; i++) {
 							neutron newNeutron = neutron(iGroupCount, myNeutron.x, myNeutron.direction, 1);
 							multiGroupParticleSourceBank[iGroupCount].push_back(newNeutron);
@@ -61,19 +61,21 @@ void MonteCarlo::transport() {
 							myNeutron.x += pathLength * myNeutron.direction;
 						} //通量统计完毕，碰撞点确定
 
-						  //轮盘赌判断粒子是裂变还是散射
-						  //计算当地总散射截面
-						double nativeSigmaS = std::accumulate(((this->inputGeometry.getMaterial(myNeutron.x)).sigmaS[iGroupCount]).begin(), ((this->inputGeometry.getMaterial(myNeutron.x)).sigmaS[iGroupCount]).end(), 0);
+						//轮盘赌判断粒子是裂变还是散射
+						//计算当地总散射截面
+						//double nativeSigmaS = std::accumulate(++((this->inputGeometry.getMaterial(myNeutron.x)).sigmaS[iGroupCount]).begin(), ((this->inputGeometry.getMaterial(myNeutron.x)).sigmaS[iGroupCount]).end(), 0);
+						//double nativeSigmaS = this->inputGeometry.getMaterial(myNeutron.x).sigmaS[iGroupCount][0];
 						//获取当地总截面
-						double nativeSigmaT = (this->inputGeometry.getMaterial(myNeutron.x)).sigmaT[iGroupCount];
-						if (roulette(nativeSigmaS / nativeSigmaT)) { //拿散射的权重赌，赢则返回0
-																	 //返回1说明轮盘赌输掉，进行裂变
-							fission(myNeutron, iGroupCount, multiGroupNextParticleSourceBank);
-						}
-						else {
+						//double nativeSigmaT = (this->inputGeometry.getMaterial(myNeutron.x)).sigmaT[iGroupCount];
+						double fissionWeightTemp = (this->inputGeometry.getMaterial(myNeutron.x)).nuSigmaF[iGroupCount] / (this->inputGeometry.getMaterial(myNeutron.x)).sigmaT[iGroupCount];
+						//if (roulette(nativeSigmaS / nativeSigmaT)) { //拿散射的权重赌，赢则返回0
+							//返回1说明轮盘赌输掉，进行裂变
+							fission(myNeutron, iGroupCount, fissionWeightTemp, multiGroupNextParticleSourceBank);
+						//}
+						//else {
 							//否则散射
 							scatter(myNeutron, iGroupCount, multiGroupParticleSourceBank);
-						}
+						//}
 					} //权重不为0的中子输运完毕
 				} //当前群输运完毕
 			} //所有群输运完毕
@@ -93,20 +95,25 @@ void MonteCarlo::transport() {
 			activeFlux(iGenerationCount);
 		}
 
+		std::cout << "Keff: " << std::setw(8) << std::setprecision(6) << Keff[iGenerationCount] << "        Average Keff: " << std::setw(8) << std::setprecision(6) << this->averageKeff[iGenerationCount] << std::endl;
+
 		//更新中子源
 		int nextGenerationNeutronNumber = 0;
-		for (int i = 0; i < this->groupNumber; i++)nextGenerationNeutronNumber += this->multiGroupNextParticleSourceBank[i].size();
-
-		int nextNeutronWeight = this->currentParticleNumber / nextGenerationNeutronNumber;
+		for (int i = 1; i <= this->groupNumber; i++)nextGenerationNeutronNumber += this->multiGroupNextParticleSourceBank[i].size();
+		//计算下一代每个中子的权重
+		double nextNeutronWeight = neutronNumber / nextGenerationNeutronNumber;
+		this->currentParticleNumber = nextGenerationNeutronNumber;
+		std::cout << "Next Generation neutron number: " << nextGenerationNeutronNumber << std::endl << std::endl;
 		//更新中子库
 		multiGroupParticleSourceBank = multiGroupNextParticleSourceBank;
-		for (int i = 0; i < this->groupNumber; i++) {
+		for (int i = 1; i <= this->groupNumber; i++) {
 			if (multiGroupParticleSourceBank[i].size() > 0) {
 				for (int j = 0; j < multiGroupParticleSourceBank[i].size(); j++)multiGroupParticleSourceBank[i][j].weight = nextNeutronWeight;
 			}
 			//清空缓存的中子库
 			this->multiGroupNextParticleSourceBank[i].clear();
 		}
+		
 
 	} //所有代输运完毕
 }

@@ -4,7 +4,6 @@
 
 #include "line.h"
 #include "exception.h"
-//#include "MonteCarlo.h"
 
 #include <algorithm>
 #include <map>
@@ -37,7 +36,20 @@ startFlag getStartKeyword(iLine _line) throw(mcException);
 	返回：一个映射，包含计算条件关键字和对应的数字
 	示例：getCalculationCondition(line);
 ---------------------------------------------------*/
-std::pair<std::string, int> getCalculationCondition(iLine _line) throw(mcException);
+//std::pair<std::string, int> getCalculationCondition(iLine _line) throw(mcException);
+template<typename T>
+std::pair<std::string, T> getCalculationCondition(iLine _line) throw(mcException) {
+	if (_line.countWords() != 2) throw("Error! E003: Syntax error: illegal parameter number for calculation condition!");
+	std::stringstream __ssTemp;
+	__ssTemp << _line[1];
+	T __numberTemp;
+	//将第二个单词对应的值转为int
+	__ssTemp >> __numberTemp;
+	std::pair<std::string, T> __conditionValueTemp(_line[0], __numberTemp);
+	//将计算条件和数值存入映射容器
+	//make_pair(_line[0], __numberTemp));
+	return __conditionValueTemp;
+}
 
 /*---------------------------------
 	功能：将字符串转为双精度浮点数。

@@ -3,19 +3,57 @@
 
 #include <iostream>
 
-int geometry::getCellID(double _x) {
-	for (int i = 0; i < this->geometryCell.size(); i++) {
-		if (_x >= geometryCell[i].left&&_x < geometryCell[i].right)return i + 1;
+void geometry::setLeftBoundaryCondition(int _boundaryCondition) {
+	switch (_boundaryCondition)
+	{
+	case 0:
+		leftCondition = A;
+		break;
+	case 1:
+		leftCondition = R;
+		break;
+	case 2:
+		leftCondition = W;
+		break;
+	default:
+		break;
 	}
 }
 
+void geometry::setRightBoundaryCondition(int _boundaryCondition) {
+	switch (_boundaryCondition)
+	{
+	case 0:
+		rightCondition = A;
+		break;
+	case 1:
+		rightCondition = R;
+		break;
+	case 2:
+		rightCondition = W;
+		break;
+	default:
+		break;
+	}
+}
+
+int geometry::getCellID(double _x) {
+	for (int i = 0; i < this->geometryCell.size(); i++) {
+		if (_x >= geometryCell[i].left&&_x < geometryCell[i].right)return i;
+	}
+	//如果位置_x恰好在几何右边界
+	if (_x = geometryCell[this->geometryCell.size() - 1].right) return this->geometryCell.size() - 1;
+}
+
 material geometry::getMaterial(double _x) {
-	return this->geometryCell[getCellID(_x) - 1].mat;
+	return this->geometryCell[getCellID(_x)].mat;
 }
 
 bool geometry::ifCrossCellBoundary(neutron _neutron, double _pathLength) {
 	double newX = _neutron.x + _neutron.direction*_pathLength;  //运动指定径迹长度后的位置
-	return newX < this->geometryCell[getCellID(newX)].left || newX > this->geometryCell[getCellID(newX)].right;
+	//若超出几何边界，直接返回真
+	if (newX<0 || newX>this->right) return true;
+	return newX < this->geometryCell[getCellID(_neutron.x)].left || newX > this->geometryCell[getCellID(_neutron.x)].right;
 }
 
 bool geometry::ifBeyondGeometry(neutron _neutron, double _pathLength) {

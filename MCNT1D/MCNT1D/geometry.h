@@ -14,52 +14,41 @@
 typedef enum { A, R, W } boundaryCondition;
 
 class geometry {
-	double left;
-	double right;
-	boundaryCondition leftCondition;
-	boundaryCondition rightCondition;
-	int cellNumber;
+	double left;                       //几何左边界
+	double right;                      //几何右边界
+	boundaryCondition leftCondition;   //左边界条件
+	boundaryCondition rightCondition;  //右边界条件
+	int cellNumber;                    //栅元数
 
 public:
-	std::vector<cell> geometryCell;
+	std::vector<cell> geometryCell;    //包含的所有栅元
 
+	//默认构造函数
+	geometry() = default;
+
+	//设置左边界位置
 	void setLeft(double _leftPosition) { left = _leftPosition; }
+
+	//设置右边界位置
 	void setRight(double _rightPosition) { right = _rightPosition; }
 
-	void setLeftBoundaryCondition(int _boundaryCondition) {
-		switch (_boundaryCondition)
-		{
-		case 0:
-			leftCondition = A;
-			break;
-		case 1:
-			leftCondition = R;
-			break;
-		case 2:
-			leftCondition = W;
-			break;
-		default:
-			break;
-		}
-	}
+	/*------------------------------------------------------
+		功能：设置左边界条件。
+		参数：表示边界条件的数字，吸收为0，全反射为1，白边界为2
+		返回：无
+		示例：setLeftBoundaryCondition(1);
+	-------------------------------------------------------*/
+	void setLeftBoundaryCondition(int _boundaryCondition);
 
-	void setRightBoundaryCondition(int _boundaryCondition) {
-		switch (_boundaryCondition)
-		{
-		case 0:
-			rightCondition = A;
-			break;
-		case 1:
-			rightCondition = R;
-			break;
-		case 2:
-			rightCondition = W;
-			break;
-		default:
-			break;
-		}
-	}
+	/*------------------------------------------------------
+		功能：设置右边界条件。
+		参数：表示边界条件的数字，吸收为0，全反射为1，白边界为2
+		返回：无
+		示例：setRighttBoundaryCondition(1);
+	-------------------------------------------------------*/
+	void setRightBoundaryCondition(int _boundaryCondition);
 
+	//构造函数
 	geometry(double _left, double _right, std::vector<cell> _geomCell) :left(_left), right(_right), geometryCell(_geomCell) {}
 	
 	/*------------------------------
