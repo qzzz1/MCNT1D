@@ -1,7 +1,36 @@
 #include <string>
+#include <cstdio>
+#include <iostream>
+#include <memory>
+#include <stdexcept>
+#include <array>
 
 #include "MonteCarlo.h"
 #include "matlab.h"
+
+
+/*------------------------------------------------------------------
+	功能：获取命令窗口某个命令的执行结果。
+	参数：命令
+	返回：执行结果（若结尾有回车，则去除回车）
+	示例：cmdExecuteResult("cd");
+-------------------------------------------------------------------*/
+std::string cmdExecuteResult(const char* cmd)
+{
+	std::array<char, 256> buffer;
+	std::string result;
+	std::shared_ptr<FILE> pipe(_popen(cmd, "r"), _pclose);
+	if (!pipe) throw std::runtime_error("popen() failed!");
+	while (!feof(pipe.get())) {
+		if (fgets(buffer.data(), 256, pipe.get()) != NULL)
+			result += buffer.data();
+	}
+	int resultLength = result.length();
+	if (result[resultLength - 1] == '\n') {
+		result.erase(resultLength - 1);
+	}
+	return result;
+}
 
 void MonteCarlo::output() {
 	//检查能否打开输出文件
@@ -31,17 +60,22 @@ void MonteCarlo::output() {
 	outputFile.close();
 	
 	std::ofstream matlabScript("scriptTemp.m");
-	matlabScript << "a=load('C:\\Users\\LI Jin\\Documents\\GitHub\\MCNT1D\\MCNT1D\\MCNT1D\\data.temp');\n"
+	//获取当前路径
+	std::string dir = cmdExecuteResult("cd");
+	matlabScript<<"a=load('"<<dir<<"\\data.temp');\n"
+	//matlabScript << "a=load('C:\\Users\\LI Jin\\Documents\\GitHub\\MCNT1D\\MCNT1D\\MCNT1D\\data.temp');\n"
 		<< "plot(a(:,1),a(:,2));\n"
 		<< "xlabel('Generation Number');\n"
 		<< "ylabel('Keff');\n"
 		<< "legend('Keff');\n";
 	matlabScript.close();
 	//调用matlab输出Keff
-	std::string commandTemp = "run('C:\\Users\\LI Jin\\Documents\\GitHub\\MCNT1D\\MCNT1D\\MCNT1D\\scriptTemp.m');";
+	std::string commandTemp = "run('" + dir + "\\scriptTemp.m');";
+	//std::string commandTemp = "run('C:\\Users\\LI Jin\\Documents\\GitHub\\MCNT1D\\MCNT1D\\MCNT1D\\scriptTemp.m');";
 	iMatlab mtlb(commandTemp);
 	mtlb.open();
 	mtlb.run();
 	std::system("pause");
+	//关闭引擎
 	mtlb.close();
 }

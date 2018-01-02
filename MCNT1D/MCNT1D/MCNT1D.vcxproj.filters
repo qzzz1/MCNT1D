@@ -18,9 +18,6 @@
     <ClCompile Include="MCNT1D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="particle.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="output.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

@@ -125,7 +125,6 @@
     <ClCompile Include="matlab.cpp" />
     <ClCompile Include="MCNT1D.cpp" />
     <ClCompile Include="output.cpp" />
-    <ClCompile Include="particle.cpp" />
     <ClCompile Include="MonteCarlo.cpp" />
     <ClCompile Include="rand.cpp" />
     <ClCompile Include="sample.cpp" />

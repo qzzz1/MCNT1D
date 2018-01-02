@@ -4,13 +4,19 @@
 #include "sample.h"
 
 #include <iostream>
+#include <string>
 #include <numeric>                      
 
 void MonteCarlo::run() {
-	this->readInput();
-	this->init();
-	this->transport();
-	this->output();
+	try {
+		this->readInput();
+		this->init();
+		this->transport();
+		this->output();
+	}
+	catch (mcException &e) {
+		std::cout << e.getMessage() << std::endl;
+	}
 }
 
 MonteCarlo::MonteCarlo(const std::string _inFileName, const std::string _outFileName) {
