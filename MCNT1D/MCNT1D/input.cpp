@@ -27,16 +27,16 @@ iLine translate(std::string _line) {
 startFlag getStartKeyword(iLine _line) throw(mcException) {
 	if (_line.isEmpty())throw("Warning! W001:Empty line for getStartKeyword!");
 	std::string __firstWord = _line[0];
-	if (__firstWord == "start_calculationcondition") {
+	if (__firstWord == "condition") {
 		return CC;
 	}
-	else if (__firstWord == "start_calculationparameter") {
+	else if (__firstWord == "parameter") {
 		return CP;
 	}
-	else if (__firstWord == "start_material") {
+	else if (__firstWord == "material") {
 		return MT;
 	}
-	else if (__firstWord == "start_cell") {
+	else if (__firstWord == "cell") {
 		return CL;
 	}
 	else {
@@ -44,7 +44,14 @@ startFlag getStartKeyword(iLine _line) throw(mcException) {
 	}
 }
 
-
+template<typename T>
+T string2number(std::string _string) {
+	std::stringstream __sstemp;
+	T __result = 0;
+	__sstemp << _string;
+	__sstemp >> __result;
+	return __result;
+}
 
 double s2d(std::string _string) {
 	std::stringstream __ssTemp;
@@ -99,12 +106,12 @@ void MonteCarlo::readInput() throw(mcException) {
 						//读完计算条件
 						calculationConditionMap.insert(getCalculationCondition<int>(ccLineRead));
 					}
-				} while (ccLineRead[0] != "end_calculationcondition");
+				} while (ccLineRead[0] != "end");
 				//读完所有计算条件后，对当前MonteCarlo对象初始化
 				this->cellNumber = calculationConditionMap["cellnumber"];
 				this->groupNumber = calculationConditionMap["groupnumber"];
 				this->materialNumber = calculationConditionMap["materialnumber"];
-				this->repetitiveNumber = calculationConditionMap["repetitivenumber"];
+				this->repetitiveNumber = calculationConditionMap["repetenumber"];
 
 				//初始化MonteCarlo中的material
 				this->inputMaterial.resize(materialNumber + 1);
@@ -206,14 +213,14 @@ void MonteCarlo::readInput() throw(mcException) {
 						this->totalGenerationNumber = s2i(cpLine[2]);
 						this->inactiveGenerationNumber = s2i(cpLine[3]);
 					}
-					else if (cpLine[0]=="boundarycondition") {
+					else if (cpLine[0]=="boundary") {
 						this->inputGeometry.setLeftBoundaryCondition(s2i(cpLine[1]));
 						this->inputGeometry.setRightBoundaryCondition(s2i(cpLine[2]));
 					}
 					else if (cpLine.countWords()==2) {
 						calculationParameterMap.insert(getCalculationCondition<double>(cpLine));
 					}
-				} while (cpLine[0] != "end_calculationparameter");
+				} while (cpLine[0] != "end");
 				//存储权窗大小
 				this->weightMax = calculationParameterMap["weightmax"];
 				this->weightMin = calculationParameterMap["weightmin"];

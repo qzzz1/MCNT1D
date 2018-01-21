@@ -37,7 +37,7 @@ MonteCarlo::MonteCarlo(const std::string _inFileName, const std::string _outFile
 }
 
 int MonteCarlo::roulette(double _weight) {
-	if (_weight - (int)_weight < random())return (int)_weight;
+	if ((_weight - (int)_weight) < random())return (int)(_weight);
 	else return (int)(_weight + 1);
 }
 
@@ -115,6 +115,13 @@ void MonteCarlo::currentKeff(int _iterationNumber) {
 
 void MonteCarlo::currentFlux(int _iterationNumber) {
 	//通量数据存储于MonteCarlo::flux中，第一维是能群号，第二维是栅元号
+	for (int iGroup = 1; iGroup <= this->groupNumber; iGroup++) {
+		for (int iCell = 1; iCell <= this->cellNumber; iCell++) {
+			this->flux[iGroup][iCell] = 0;
+			this->accumulateFlux[iGroup][iCell] = 0;
+			this->accumulateFluxSquare[iGroup][iCell] = 0;
+		}
+	}
 }
 
 void MonteCarlo::activeKeff(int _iterationNumber) {
@@ -123,11 +130,12 @@ void MonteCarlo::activeKeff(int _iterationNumber) {
 
 	double accmKeff = std::accumulate(Keff.begin() + inactiveGenerationNumber, Keff.begin() + _iterationNumber, 0.0);
 	averageKeff[_iterationNumber] = accmKeff / (_iterationNumber - this->inactiveGenerationNumber);
+	this->accumulateKeffSquare = accmKeff;
 
 	//计算Keff的统计误差
 	double standardDeviation = 0;
 	if (_iterationNumber > this->inactiveGenerationNumber + 1) {
-		standardDeviation = sqrt((this->accumulateKeffSquare / (_iterationNumber - this->inactiveGenerationNumber) - (this->averageKeff[_iterationNumber - 1])*(this->averageKeff[_iterationNumber - 1])) / (_iterationNumber - this->inactiveGenerationNumber - 1)) / this->averageKeff[_iterationNumber - 1];
+		standardDeviation = sqrt(fabs((this->accumulateKeffSquare / (_iterationNumber - this->inactiveGenerationNumber) - (this->averageKeff[_iterationNumber - 1])*(this->averageKeff[_iterationNumber - 1])) / (_iterationNumber - this->inactiveGenerationNumber - 1))) / this->averageKeff[_iterationNumber - 1];
 	}
 	//计算Keff统计误差并存储
 	this->KeffStandardDeviation[_iterationNumber] = standardDeviation;
@@ -138,9 +146,12 @@ void MonteCarlo::activeFlux(int _iterationNumber) {
 		for (int iCell = 1; iCell <= this->cellNumber; iCell++) {
 			this->accumulateFlux[iGroup][iCell] += this->flux[iGroup][iCell];
 			this->accumulateFluxSquare[iGroup][iCell] += (this->flux[iGroup][iCell])*(this->flux[iGroup][iCell]);
+
+			this->flux[iGroup][iCell] = 0;
+
 			this->averageFlux[iGroup][iCell] = this->accumulateFlux[iGroup][iCell] / (_iterationNumber - this->inactiveGenerationNumber);
 			//第一个活跃代没有统计误差
-			if(_iterationNumber!=this->inactiveGenerationNumber + 1) this->fluxStandardDeviation[iGroup][iCell] = sqrt(((this->accumulateFluxSquare[iGroup][iCell] / (_iterationNumber - this->inactiveGenerationNumber) - (this->averageFlux[iGroup][iCell])*(this->averageFlux[iGroup][iCell])) / (_iterationNumber - this->inactiveGenerationNumber - 1))) / this->averageFlux[iGroup][iCell];
+			if(_iterationNumber!=(this->inactiveGenerationNumber + 1)) this->fluxStandardDeviation[iGroup][iCell] = sqrt(fabs(((this->accumulateFluxSquare[iGroup][iCell] / (_iterationNumber - this->inactiveGenerationNumber) - (this->averageFlux[iGroup][iCell])*(this->averageFlux[iGroup][iCell])) / (_iterationNumber - this->inactiveGenerationNumber - 1)))) / this->averageFlux[iGroup][iCell];
 			else this->fluxStandardDeviation[iGroup][iCell] = 0;
 		}
 	}

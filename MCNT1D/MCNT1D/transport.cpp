@@ -9,11 +9,14 @@ void MonteCarlo::transport() {
 	for (int iGenerationCount = 1; iGenerationCount <= this->totalGenerationNumber; iGenerationCount++) {
 		//分群输运
 		while (!ifNeutronSourceBankEmpty()) {
+			//群间迭代
 			for (int iGroupCount = 1; iGroupCount <= this->groupNumber; iGroupCount++) {
+				//单群迭代
 				while (!this->multiGroupParticleSourceBank[iGroupCount].empty()) {
 					neutron myNeutron;
 					//从粒子源中抽取一个粒子
 					myNeutron = sampleFromParticleSourceBank((this->multiGroupParticleSourceBank)[iGroupCount]);
+					//std::cout << myNeutron.x << std::endl;
 
 					//权重过大的中子进行轮盘赌，分为数个权重为1的中子
 					if (myNeutron.weight > weightMax) {
@@ -34,6 +37,15 @@ void MonteCarlo::transport() {
 						double pathLength = samplePathLength(iGroupCount, this->inputGeometry, myNeutron);
 						//判断是否穿过栅元边界
 						if (this->inputGeometry.ifCrossCellBoundary(myNeutron, pathLength)) {
+							/*
+							if (myNeutron.x < 7 || myNeutron.x>154) {
+								std::cout << "Find neutron in reflector" << std::endl;
+							}
+
+							if (myNeutron.x < 10 && myNeutron.x>7 && myNeutron.direction < 0) {
+								std::cout << "A neutron" << std::endl;
+							}
+							*/
 							//统计通量
 							if (myNeutron.direction > 0) {
 								double distanceToBoundary = (this->inputGeometry.geometryCell[this->inputGeometry.getCellID(myNeutron.x)]).right - myNeutron.x;
@@ -54,6 +66,11 @@ void MonteCarlo::transport() {
 							continue;
 						}
 						else {
+							/*
+							if (myNeutron.x < 7 || myNeutron.x>154) {
+								std::cout << "Find neutron in reflector" << std::endl;
+							}
+							*/
 							//统计通量
 							this->flux[iGroupCount][this->inputGeometry.getCellID(myNeutron.x)] += pathLength * myNeutron.weight;
 
@@ -101,7 +118,7 @@ void MonteCarlo::transport() {
 		int nextGenerationNeutronNumber = 0;
 		for (int i = 1; i <= this->groupNumber; i++)nextGenerationNeutronNumber += this->multiGroupNextParticleSourceBank[i].size();
 		//计算下一代每个中子的权重
-		double nextNeutronWeight = neutronNumber / nextGenerationNeutronNumber;
+		double nextNeutronWeight = (neutronNumber + 0.0) / nextGenerationNeutronNumber;
 		this->currentParticleNumber = nextGenerationNeutronNumber;
 		std::cout << "Next Generation neutron number: " << nextGenerationNeutronNumber << std::endl << std::endl;
 		//更新中子库

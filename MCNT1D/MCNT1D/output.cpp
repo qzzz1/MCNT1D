@@ -51,10 +51,24 @@ void MonteCarlo::output() {
 		}
 		//输出活跃代有效增殖系数
 		outputFile << "Active cycle Keff:" << std::endl
-			<< "Cycle       Keff       Average" << std::endl;
+			<< "Cycle       Keff         Average           St.d" << std::endl;
 		for (int iGenerationCount = inactiveGenerationNumber + 1; iGenerationCount <= totalGenerationNumber; iGenerationCount++) {
-			outputFile << std::setw(5) << iGenerationCount << "     " << std::setw(8)<<std::setprecision(6) << Keff[iGenerationCount] << "     " << std::setw(8) <<std::setprecision(8)<< averageKeff[iGenerationCount] << std::endl;
+			outputFile << std::setw(5) << iGenerationCount << "     "
+				<< std::setw(8) << std::setprecision(6) << Keff[iGenerationCount] << "     "
+				<< std::setw(8) << std::setprecision(8) << averageKeff[iGenerationCount] << "     "
+				<< std::setw(8) << std::setprecision(8) << this->KeffStandardDeviation[iGenerationCount] << std::endl;
 			matlabPlotData << std::setw(5) << iGenerationCount << "     " << std::setw(8)<<std::setprecision(6) << averageKeff[iGenerationCount] << std::endl;
+		}
+
+		//输出通量
+		outputFile << "Flux:" << std::endl;
+		for (int i = 1; i <= this->groupNumber; i++) {
+			outputFile << "Group " << i << ":" << std::endl;
+			for (int j = 1; j <= this->cellNumber; j++) {
+				outputFile << "Cell " << std::setw(3) << j << ": "
+					<< std::setw(8) << std::setprecision(6) << this->averageFlux[i][j] << "       "
+					<< std::setw(8) << std::setprecision(6) << this->fluxStandardDeviation[i][j] << std::endl;
+			}
 		}
 	}
 	outputFile.close();
@@ -78,4 +92,7 @@ void MonteCarlo::output() {
 	std::system("pause");
 	//关闭引擎
 	mtlb.close();
+
+	//system("del *.temp");           //删除临时文件
+	//system("del scriptTemp.m");     //删除临时脚本
 }

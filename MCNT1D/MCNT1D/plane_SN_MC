@@ -1,0 +1,26 @@
+//MCNT1D测试输入文件
+//一维单群临界平板裸堆算例
+//material模块和cell模块务必按顺序，其他模块不必按顺序
+//模块间用空行隔开
+
+Condition                              //定义计算条件
+CellNumber  200                    //栅元数为100
+GroupNumber 1                     //单群
+MaterialNumber 1
+RepeteNumber  1   
+End
+
+Material           //定义材料，材料号应连续，各截面定义无顺序
+mat  1 NuSigmaF  0.0225 SigmaT 0.050  SigmaS 0.030  Yield 1 
+End
+
+Cell                              //开始定义重复栅元
+Cell1  1    200     0.660053  material 1   
+End
+
+Parameter                          //开始定义计算参数
+Neutron   2000 100 20       //2000个源中子，总迭代次数100，20非活跃代
+WeightMin 0.1
+WeightMax 1
+BoundaryCondition  0 0     //边界条件左反射右吸收
+End

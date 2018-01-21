@@ -1,0 +1,31 @@
+//MCNT1D测试输入文件
+//一维两群带反射层核燃料增殖泄露计算
+//material模块和cell模块务必按顺序，其他模块不必按顺序
+//模块间用空行隔开
+
+Condition                                 //定义计算条件
+CellNumber  160                    //栅元数为160
+GroupNumber 2                     //两群
+MaterialNumber 2                  //两种材料
+RepeteNumber  4                   //4种重复栅元
+End
+
+Material                       //定义材料，材料号应连续，各截面定义无顺序，截面数据按群号顺序
+Mat  1 NuSigmaF  0.00569 0.104865 SigmaT 0.02477  0.078577  SigmaS 0 0.015512  0 0  Yield 1 0  1 0 
+Mat  2 NuSigmaF  0             0               SigmaT  0.03082  0.027474 SigmaS 0 0.028772  0 0  Yield 0 0  0 0 
+End
+
+Cell                                             //定义重复栅元
+Cell1  1    30     1  mat 2           //1到30号栅元，宽1cm，全部填充为材料2
+Cell2  31   80     1  mat 1                                   
+Cell3  81   130    1  mat 1     
+Cell4  131  160    1  mat 2  
+End
+
+Parameter                                 //开始定义计算参数
+Neutron   2000 100 20           //2000个源中子，总迭代次数100，20非活跃代
+WeightMin 0.1
+WeightMax 1
+Boundary  0 0                          //边界条件全吸收
+End
+
